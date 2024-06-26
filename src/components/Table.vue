@@ -1,8 +1,83 @@
+<script setup lang="ts">
+import { ref, computed, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
+import Pagination from '@components/Pagination.vue';
+import Input from '@components/Input.vue';
+
+interface Field {
+  key: string;
+  label: string;
+  type: string;
+}
+
+interface Row {
+  [key: string]: string;
+}
+
+interface Props {
+  fields: Field[]
+  data: Row[]
+  isPaginationShown?: Boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isPaginationShown: () => true,
+});
+
+const filter = ref('');
+const currentPage = ref(1);
+const perPage = ref(20);
+const rows = ref(props.data.length);
+const router = useRouter();
+const isPaginationShown = ref(true);
+
+const filteredRows = computed(() => {
+  const filteredData = props.data.filter((row) => {
+    for (const field of props.fields) {
+      if (row[field.key].toString().toLowerCase().includes(filter.value.toLowerCase())) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+  return filteredData
+    .slice((currentPage.value - 1) * perPage.value, currentPage.value * perPage.value);
+});
+
+const handleSearch = (event: Event) => {
+  filter.value = (event.target as HTMLInputElement).value;
+}
+
+const onPageSelect = (event: Event) => {
+  onPageChange( +(event.target as HTMLInputElement).value );
+}
+
+const onPageChange = (pageNumber: number) => {
+  currentPage.value = pageNumber;
+
+  router.push({
+    path: '/',
+    query: { page: currentPage.value }
+  });
+}
+
+watchEffect(() => {
+  if (filteredRows.value.length < perPage.value) {
+    isPaginationShown.value = false;
+  } else {
+    isPaginationShown.value = true;
+  }
+});
+</script>
+
 <template>
   <div class="datatable">
     <div class="datatable__search-wrap">
       <Input @input="handleSearch" />
     </div>
+
     <table class="datatable__table">
       <thead>
         <tr>
@@ -38,7 +113,9 @@
         </tr>
       </tbody>
     </table>
-    <div class="datatable__pagination-wrap">
+
+    <div
+      class="datatable__pagination-wrap">
       <Pagination
         v-if="isPaginationShown"
         :currentPage="currentPage"
@@ -46,82 +123,10 @@
         :perPage="perPage"
         @goToPrevPage="onPageChange(currentPage -= 1)"
         @goToNextPage="onPageChange(currentPage += 1)"
-        @goToSelectedPage="($event: any) => onPageChange($event.target.value)" />
+        @goToSelectedPage="onPageSelect" />
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import Pagination from './Pagination.vue';
-import Input from './Input.vue';
-
-interface Field {
-  key: string;
-  label: string;
-  type: string;
-}
-
-interface Row {
-  [key: string]: string;
-}
-
-export default {
-  components: { Pagination, Input },
-  props: {
-    fields: { type: Array as () => Field[], required: true },
-    data: { type: Array as () => Row[], required: true },
-    isPaginationShown: { type: Boolean, default: false },
-  },
-  setup(props) {
-    const filter = ref('');
-    const currentPage = ref(1);
-    const perPage = ref(20);
-    const rows = ref(props.data.length);
-    const router = useRouter();
-
-    const filteredRows = computed(() => {
-      const filteredData = props.data.filter((row) => {
-        for (const field of props.fields) {
-          if (row[field.key].toString().toLowerCase().includes(filter.value.toLowerCase())) {
-            return true;
-          }
-        }
-
-        return false;
-      });
-
-      return filteredData
-        .slice((currentPage.value - 1) * perPage.value, currentPage.value * perPage.value);
-    });
-
-    const handleSearch = (event: Event) => {
-      filter.value = (event.target as HTMLInputElement).value;
-    }
-
-    const onPageChange = (pageNumber: number) => {
-      currentPage.value = +pageNumber;
-
-      router.push({
-        path: '/',
-        query: { page: currentPage.value }
-      });
-    }
-
-    return {
-      filter,
-      currentPage,
-      perPage,
-      rows,
-      filteredRows,
-      isPaginationShown: props.isPaginationShown,
-      onPageChange,
-      handleSearch,
-    };
-  },
-};
-</script>
 
 <style scoped lang="scss">
 .datatable {

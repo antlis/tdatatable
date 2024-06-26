@@ -1,3 +1,15 @@
+<script setup lang="ts">
+import { toRefs } from 'vue';
+
+const props = defineProps<{
+  currentPage: number
+  perPage: number
+  rows: number
+}>()
+
+const { currentPage, perPage, rows } = toRefs(props);
+</script>
+
 <template>
   <div class="pagination">
     <button
@@ -6,17 +18,17 @@
       @click="$emit('goToPrevPage')">
       Prev
     </button>
-    <div>
-      <select
-        class="pagination__select"
-        @change="($event) => $emit('goToSelectedPage', $event)">
-        <option
-          v-for="pageNum in Math.ceil(rows / perPage)"
-          :selected="pageNum === currentPage">
-          {{ pageNum }}
-        </option>
-      </select>
-    </div>
+
+    <select
+      class="pagination__select"
+      @change="($event) => $emit('goToSelectedPage', $event)">
+      <option
+        v-for="pageNum in Math.ceil(rows / perPage)"
+        :selected="pageNum === currentPage">
+        {{ pageNum }}
+      </option>
+    </select>
+
     <button
       v-if="currentPage < Math.ceil(rows / perPage)"
       class="pagination__btn"
@@ -25,21 +37,6 @@
     </button>
   </div>
 </template>
-
-<script lang="ts">
-import { toRefs } from 'vue';
-
-export default {
-  props: {
-    currentPage: { type: Number, required: true },
-    perPage: { type: Number, required: true },
-    rows: { type: Number, required: true },
-  },
-  setup(props) {
-    return toRefs(props);
-  },
-};
-</script>
 
 <style scoped lang="scss">
 .pagination {

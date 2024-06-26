@@ -1,25 +1,19 @@
+<script setup lang="ts">
+interface Props {
+  placeholder?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  placeholder: 'Search ...',
+});
+</script>
+
 <template>
   <input
     class="input"
     :placeholder="placeholder"
     @input="$emit('input', $event)" />
 </template>
-
-<script lang="ts">
-// import { ref, computed } from 'vue';
-
-export default {
-  props: {
-    placeholder: { type: String, default: 'Search ...' },
-  },
-  setup(props) {
-
-    return {
-      ...props
-    };
-  },
-};
-</script>
 
 <style scoped>
 .input {
