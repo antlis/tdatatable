@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, watchEffect, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import Pagination from '@components/Pagination.vue';
 import Input from '@components/Input.vue';
 
 interface Field {
-  key: string;
-  label: string;
-  type: string;
+  key: string
+  label: string
+  type: string
+  sortable: boolean
 }
 
 interface Row {
-  [key: string]: string;
+  [key: string]: string
 }
 
 interface Props {
@@ -29,10 +30,13 @@ const currentPage = ref(1);
 const perPage = ref(20);
 const rows = ref(props.data.length);
 const router = useRouter();
+const route = useRoute();
 const isPaginationShown = ref(true);
+const sorted = ref<string[]>([]);
+const data = ref(props.data);
 
 const filteredRows = computed(() => {
-  const filteredData = props.data.filter((row) => {
+  const filteredData = data.value.filter((row: any) => {
     for (const field of props.fields) {
       if (row[field.key].toString().toLowerCase().includes(filter.value.toLowerCase())) {
         return true;
@@ -41,6 +45,7 @@ const filteredRows = computed(() => {
 
     return false;
   });
+
 
   return filteredData
     .slice((currentPage.value - 1) * perPage.value, currentPage.value * perPage.value);
@@ -57,10 +62,16 @@ const onPageSelect = (event: Event) => {
 const onPageChange = (pageNumber: number) => {
   currentPage.value = pageNumber;
 
-  router.push({
-    path: '/',
-    query: { page: currentPage.value }
-  });
+}
+
+const handleSort = (fieldKey: string) => {
+  if (sorted.value.includes(fieldKey)) {
+    sorted.value = [];
+    data.value.sort((a, b) => b[fieldKey].localeCompare(a[fieldKey]));
+  } else {
+    sorted.value.push(fieldKey);
+    data.value.sort((a, b) => a[fieldKey].localeCompare(b[fieldKey]));
+  }
 }
 
 watchEffect(() => {
@@ -68,6 +79,16 @@ watchEffect(() => {
     isPaginationShown.value = false;
   } else {
     isPaginationShown.value = true;
+  }
+});
+
+watch(currentPage, (newVal, oldVal) => {
+  console.log(route.path);
+  if (newVal !== oldVal) {
+    router.push({
+      path: route.path,
+      query: { page: currentPage.value }
+    });
   }
 });
 </script>
@@ -81,8 +102,15 @@ watchEffect(() => {
     <table class="datatable__table">
       <thead>
         <tr>
-          <th v-for="(field, index) in fields" :key="index">
+          <th v-for="(field, key) in fields" :key="key">
             {{ field.label }}
+            <button
+              v-if="field.sortable"
+              type="button"
+              class="datatable__sort-btn"
+              @click="handleSort(field.key)">
+              {{ sorted.includes(field.key) ? '⬆️' : '⬇️' }}
+            </button>
           </th>
         </tr>
       </thead>
@@ -144,6 +172,11 @@ watchEffect(() => {
 
   &__pagination-wrap {
     margin-top: 20px;
+  }
+
+  &__sort-btn {
+    border: transparent;
+    background: transparent;
   }
 
   table, th, td {

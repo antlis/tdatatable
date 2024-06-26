@@ -11,13 +11,13 @@ import api from './assets/api.json';
 import Table from '@components/Table.vue';
 
 const fields = ref([
-  { key: 'avatar', label: 'Avatar', type: 'img' },
-  { key: 'fullName', label: 'Full Name', type: 'strin' },
-  { key: 'gender', label: 'Gender', type: 'string' },
-  { key: 'country', label: 'Country', type: 'strin' },
-  { key: 'dob', label: 'Date of birth', type: 'date' },
-  { key: 'email', label: 'Email', type: 'email' },
-  { key: 'phone', label: 'Phone', type: 'phone' },
+  { key: 'avatar', label: 'Avatar', type: 'img', sortable: false },
+  { key: 'fullName', label: 'Full Name', type: 'string', sortable: true },
+  { key: 'gender', label: 'Gender', type: 'string', sortable: true },
+  { key: 'country', label: 'Country', type: 'string', sortable: true },
+  { key: 'dob', label: 'Date of birth', type: 'date', sortable: true },
+  { key: 'email', label: 'Email', type: 'email', sortable: true },
+  { key: 'phone', label: 'Phone', type: 'phone', sortable: false },
 ]);
 
 const apiNormalized = api.results.map(({
