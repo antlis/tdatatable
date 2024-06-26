@@ -69,6 +69,7 @@ const onPageChange = (pageNumber: number) => {
 }
 
 const handleSort = (fieldKey: string) => {
+  // TODO: Implement sorting for date of birth
   if (sorted.value.includes(fieldKey)) {
     sorted.value = [];
     data.value.sort((a, b) => b[fieldKey].localeCompare(a[fieldKey]));
