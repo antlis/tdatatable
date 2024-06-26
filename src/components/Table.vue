@@ -85,9 +85,29 @@ watchEffect(() => {
   }
 });
 
+watchEffect(() => {
+  if (filter.value) {
+    router.push({
+      path: route.path,
+      query: { search: filter.value }
+    });
+  } else {
+    const queryParams = { ...route.query };
+    delete queryParams.search;
+    router.push({
+      path: route.path,
+      query: queryParams,
+    });
+  }
+});
+
 onMounted(() => {
   if (route.query?.page) {
     currentPage.value = +route.query.page;
+  }
+  if (route.query?.search) {
+    console.log(route.query.search);
+    filter.value = (route.query.search as string);
   }
 });
 </script>
