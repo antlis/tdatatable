@@ -38,6 +38,7 @@ const data = ref(props.data);
 const filteredRows = computed(() => {
   const filteredData = data.value.filter((row) => {
     for (const field of props.fields) {
+      console.log(field.key);
       if (row[field.key].toString().toLowerCase().includes(filter.value.toLowerCase())) {
         return true;
       }
@@ -113,64 +114,67 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="datatable">
-    <div class="datatable__search-wrap">
-      <Input @input="handleSearch" />
-    </div>
+  <div>
+    <h1 v-if="filteredRows.length === 0">No Result</h1>
+    <div v-else class="datatable">
+      <div class="datatable__search-wrap">
+        <Input @input="handleSearch" />
+      </div>
 
-    <table class="datatable__table">
-      <thead>
-        <tr>
-          <th v-for="(field, key) in fields" :key="key">
-            {{ field.label }}
-            <button
-              v-if="field.sortable"
-              type="button"
-              class="datatable__sort-btn"
-              @click="handleSort(field.key)">
-              {{ sorted.includes(field.key) ? '⬆️' : '⬇️' }}
-            </button>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(row, index) in filteredRows" :key="index">
-          <td v-for="(field, index) in fields" :key="index">
-            <div v-if="field.type === 'img'">
-              <img :src="row[field.key]" :alt="field.label" />
-            </div>
-            <div v-else-if="field.type === 'email'">
-              <a :href="`mailto:row[field.key]`">{{ row[field.key] }}</a>
-            </div>
-            <div v-else-if="field.type === 'date'">
-              {{
-                new Date(row[field.key])
-                  .toLocaleString('en-US', {
-                    year: "numeric", month: "long", day: "numeric"
-                  })
-              }}
-            </div>
-            <div v-else-if="field.type === 'phone'">
-              <a :href="`mailto:row[field.key]`">{{ row[field.key] }}</a>
-            </div>
-            <div v-else>
-              {{ row[field.key] }}
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="datatable__table">
+        <thead>
+          <tr>
+            <th v-for="(field, key) in fields" :key="key">
+              {{ field.label }}
+              <button
+                v-if="field.sortable"
+                type="button"
+                class="datatable__sort-btn"
+                @click="handleSort(field.key)">
+                {{ sorted.includes(field.key) ? '⬆️' : '⬇️' }}
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(row, index) in filteredRows" :key="index">
+            <td v-for="(field, index) in fields" :key="index">
+              <div v-if="field.type === 'img'">
+                <img :src="row[field.key]" :alt="field.label" />
+              </div>
+              <div v-else-if="field.type === 'email'">
+                <a :href="`mailto:row[field.key]`">{{ row[field.key] }}</a>
+              </div>
+              <div v-else-if="field.type === 'date'">
+                {{
+                  new Date(row[field.key])
+                    .toLocaleString('en-US', {
+                      year: "numeric", month: "long", day: "numeric"
+                    })
+                }}
+              </div>
+              <div v-else-if="field.type === 'phone'">
+                <a :href="`mailto:row[field.key]`">{{ row[field.key] }}</a>
+              </div>
+              <div v-else>
+                {{ row[field.key] }}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div
-      class="datatable__pagination-wrap">
-      <Pagination
-        v-if="isPaginationShown"
-        :currentPage="currentPage"
-        :rows="rows"
-        :perPage="perPage"
-        @goToPrevPage="onPageChange(currentPage -= 1)"
-        @goToNextPage="onPageChange(currentPage += 1)"
-        @goToSelectedPage="onPageSelect" />
+      <div
+        class="datatable__pagination-wrap">
+        <Pagination
+          v-if="isPaginationShown"
+          :currentPage="currentPage"
+          :rows="rows"
+          :perPage="perPage"
+          @goToPrevPage="onPageChange(currentPage -= 1)"
+          @goToNextPage="onPageChange(currentPage += 1)"
+          @goToSelectedPage="onPageSelect" />
+      </div>
     </div>
   </div>
 </template>
