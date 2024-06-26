@@ -36,7 +36,7 @@ const sorted = ref<string[]>([]);
 const data = ref(props.data);
 
 const filteredRows = computed(() => {
-  const filteredData = data.value.filter((row: any) => {
+  const filteredData = data.value.filter((row) => {
     for (const field of props.fields) {
       if (row[field.key].toString().toLowerCase().includes(filter.value.toLowerCase())) {
         return true;
