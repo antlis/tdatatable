@@ -6,6 +6,8 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
+// Initially was planning to utilize json-server, and perform actuall request
+// But it did not work for some reason ¯\_(ツ)_/¯
 import api from '../assets/api.json';
 
 import Table from '@components/Table.vue';

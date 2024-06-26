@@ -52,6 +52,7 @@ const filteredRows = computed(() => {
     .slice((currentPage.value - 1) * perPage.value, currentPage.value * perPage.value);
 });
 
+// TODO: Consider adding debounce
 const handleSearch = (event: Event) => {
   filter.value = (event.target as HTMLInputElement).value;
 }
@@ -112,6 +113,8 @@ onMounted(() => {
     filter.value = (route.query.search as string);
   }
 });
+
+// TODO: Add loader ⬇️
 </script>
 
 <template>
