@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, watch } from 'vue';
+import { ref, computed, watchEffect, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Pagination from '@components/Pagination.vue';
 import Input from '@components/Input.vue';
@@ -61,7 +61,10 @@ const onPageSelect = (event: Event) => {
 
 const onPageChange = (pageNumber: number) => {
   currentPage.value = pageNumber;
-
+  router.push({
+    path: route.path,
+    query: { page: currentPage.value }
+  });
 }
 
 const handleSort = (fieldKey: string) => {
@@ -82,13 +85,9 @@ watchEffect(() => {
   }
 });
 
-watch(currentPage, (newVal, oldVal) => {
-  console.log(route.path);
-  if (newVal !== oldVal) {
-    router.push({
-      path: route.path,
-      query: { page: currentPage.value }
-    });
+onMounted(() => {
+  if (route.query?.page) {
+    currentPage.value = +route.query.page;
   }
 });
 </script>
